@@ -61,18 +61,25 @@ async function render(path, animate) {
   const content = document.getElementById("page-content");
   if (!content) return;
   if (animate) {
+    content.style.transition = "none";
     content.style.opacity = "0";
-    content.style.transform = "translateY(12px) scale(0.98)";
+    content.style.transform = "translateY(16px) scale(0.97)";
+    void content.offsetHeight;
     content.style.transition = "opacity 0.2s ease, transform 0.2s ease";
     await new Promise((r) => setTimeout(r, 200));
   }
   content.innerHTML = getPageHTML(path);
   currentPath = path;
   if (animate) {
+    content.style.transition = "opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)";
+    content.style.opacity = "0";
+    content.style.transform = "translateY(16px) scale(0.97)";
+    void content.offsetHeight;
     requestAnimationFrame(() => {
-      content.style.transition = "opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1)";
-      content.style.opacity = "1";
-      content.style.transform = "translateY(0) scale(1)";
+      requestAnimationFrame(() => {
+        content.style.opacity = "1";
+        content.style.transform = "translateY(0) scale(1)";
+      });
     });
   }
   if (path === "/") {
