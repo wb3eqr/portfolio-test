@@ -156,6 +156,35 @@ function initLangToggle() {
   });
 }
 
+function initScrollProgress() {
+  const bar = document.getElementById("scroll-progress");
+  if (!bar) return;
+  function update() {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = h > 0 ? Math.min((window.scrollY / h) * 100, 100) + "%" : "0%";
+  }
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+}
+
+function initCardTilt() {
+  document.addEventListener("mousemove", (e) => {
+    document.querySelectorAll(".card-tilt").forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2, cy = rect.height / 2;
+      const dx = (x - cx) / cx, dy = (y - cy) / cy;
+      card.style.transform = `rotateX(${-dy * 8}deg) rotateY(${dx * 8}deg)`;
+    });
+  });
+  document.addEventListener("mouseleave", () => {
+    document.querySelectorAll(".card-tilt").forEach((card) => {
+      card.style.transform = "";
+    });
+  });
+}
+
 function init() {
   applyTheme(currentTheme);
   applyLang(currentLang);
@@ -164,6 +193,8 @@ function init() {
   initMobileMenu();
   initThemeToggle();
   initLangToggle();
+  initScrollProgress();
+  initCardTilt();
   const spaPath = sessionStorage.getItem("spa:path");
   if (spaPath) { sessionStorage.removeItem("spa:path"); location.hash = "#" + spaPath; return; }
   currentPath = getPathFromHash();

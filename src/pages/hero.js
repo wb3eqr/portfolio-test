@@ -22,7 +22,7 @@ export function heroPage(t) {
           </div>
           <div class="flex-shrink-0 stagger-6" style="animation:fadeInUp 0.5s ease-out forwards;opacity:0">
             <div class="relative">
-              <div class="w-36 h-36 sm:w-52 sm:h-52 lg:w-64 lg:h-64 rounded-2xl glass-strong flex items-center justify-center overflow-hidden hover-lift" style="animation:float 6s ease-in-out infinite">
+              <div class="w-36 h-36 sm:w-52 sm:h-52 lg:w-64 lg:h-64 rounded-2xl glass-strong flex items-center justify-center overflow-hidden hover-lift card-tilt" style="animation:float 6s ease-in-out infinite">
                 <div class="absolute inset-0 shimmer-bg rounded-2xl"></div>
                 <div class="text-center px-4 relative z-10">
                   <div class="flex justify-center"><svg class="w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>

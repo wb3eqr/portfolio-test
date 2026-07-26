@@ -217,6 +217,44 @@ body {
 
 .animate-ping-slow { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
 
+#scroll-progress {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), #8B5CF6, var(--accent));
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+  z-index: 100;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.page-section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border) 20%, var(--border) 80%, transparent 100%);
+  margin: 0 auto;
+  max-width: 80%;
+}
+
+.card-tilt {
+  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.footer-link {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.footer-link:hover {
+  color: var(--accent) !important;
+  transform: translateY(-2px);
+}
+
+.text-balance { text-wrap: balance; }
+
+p { line-height: 1.7; }
+
 @media (max-width: 640px) {
   .glass-nav { height: 44px; }
 }
