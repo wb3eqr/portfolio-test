@@ -1,143 +1,238 @@
 export function initCursor() {
   const canvas = document.createElement("canvas");
-  Object.assign(canvas.style, { position: "fixed", top: "0", left: "0", width: "100%", height: "100%", pointerEvents: "none", zIndex: "9999" });
+  Object.assign(canvas.style, {
+    position: "fixed", top: "0", left: "0",
+    width: "100%", height: "100%",
+    pointerEvents: "none", zIndex: "9999",
+    cursor: "none",
+  });
   document.body.appendChild(canvas);
+  document.body.style.cursor = "none";
   const ctx = canvas.getContext("2d");
 
-  let stars = [];
-  let orbiting = [];
-  let mouse = { x: 0, y: 0, prevX: 0, prevY: 0 };
-  let frameCount = 0;
+  let particles = [];
+  let ripples = [];
+  let mouse = { x: -200, y: -200, px: -200, py: -200 };
+  let trail = [];
 
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 
-  class Star {
-    constructor(x, y) {
+  const SHAPES = ["diamond", "triangle", "dot", "hex"];
+  const PALETTE = [
+    { h: 250, s: 75, l: 65 },
+    { h: 190, s: 80, l: 65 },
+    { h: 42,  s: 85, l: 62 },
+    { h: 270, s: 70, l: 60 },
+  ];
+
+  function pickColor() { return PALETTE[Math.floor(Math.random() * PALETTE.length)]; }
+
+  class Particle {
+    constructor(x, y, vx, vy) {
       this.x = x; this.y = y;
-      this.size = Math.random() * 3 + 1.5;
-      this.rotation = Math.random() * Math.PI * 2;
-      this.rotSpeed = (Math.random() - 0.5) * 0.12;
-      this.alpha = 0.9;
-      this.decay = 0.006 + Math.random() * 0.01;
-      this.vy = -(Math.random() * 0.6 + 0.2);
-      this.vx = (Math.random() - 0.5) * 0.6;
-      this.gravity = 0.004;
-      const palettes = [
-        { h: 250 + Math.random() * 30, s: 70, l: 60 },
-        { h: 45 + Math.random() * 15, s: 85, l: 65 },
-        { h: 200 + Math.random() * 20, s: 60, l: 70 },
-        { h: 330 + Math.random() * 30, s: 60, l: 65 },
-      ];
-      const p = palettes[Math.floor(Math.random() * palettes.length)];
-      this.hue = p.h; this.sat = p.s; this.light = p.l;
-      this.points = 4 + Math.floor(Math.random() * 2);
+      this.vx = vx + (Math.random() - 0.5) * 0.3;
+      this.vy = vy + (Math.random() - 0.5) * 0.3 - Math.random() * 0.4;
+      this.size = 1.5 + Math.random() * 2.5;
+      this.life = 1;
+      this.decay = 0.008 + Math.random() * 0.012;
+      this.rot = Math.random() * Math.PI * 2;
+      this.rotSpeed = (Math.random() - 0.5) * 0.08;
+      this.shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+      this.gravity = 0.003 + Math.random() * 0.003;
+      const c = pickColor();
+      this.h = c.h; this.s = c.s; this.l = c.l;
+      this.born = performance.now();
     }
     update() {
-      this.x += this.vx; this.y += this.vy; this.vy += this.gravity;
-      this.rotation += this.rotSpeed; this.alpha -= this.decay;
-      this.size *= 0.998;
+      this.x += this.vx; this.y += this.vy;
+      this.vy += this.gravity;
+      this.vx *= 0.98;
+      this.rot += this.rotSpeed;
+      this.life -= this.decay;
     }
     draw() {
-      if (this.alpha <= 0) return;
+      if (this.life <= 0) return;
+      const a = Math.max(0, this.life);
+      const s = this.size * this.life;
       ctx.save();
       ctx.translate(this.x, this.y);
-      ctx.rotate(this.rotation);
-      ctx.globalAlpha = Math.max(0, this.alpha);
-      const outer = this.size, inner = this.size * 0.35, spikes = this.points;
-      ctx.beginPath();
-      for (let i = 0; i < spikes * 2; i++) {
-        const r = i % 2 === 0 ? outer : inner;
-        const a = (Math.PI / spikes) * i - Math.PI / 2;
-        i === 0 ? ctx.moveTo(r * Math.cos(a), r * Math.sin(a)) : ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
+      ctx.rotate(this.rot);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = `hsla(${this.h}, ${this.s}%, ${this.l}%, ${a})`;
+      ctx.shadowColor = `hsla(${this.h}, ${this.s}%, ${this.l}%, ${a * 0.5})`;
+      ctx.shadowBlur = s * 3;
+
+      if (this.shape === "diamond") {
+        ctx.beginPath();
+        ctx.moveTo(0, -s); ctx.lineTo(s, 0); ctx.lineTo(0, s); ctx.lineTo(-s, 0);
+        ctx.closePath(); ctx.fill();
+      } else if (this.shape === "triangle") {
+        ctx.beginPath();
+        ctx.moveTo(0, -s); ctx.lineTo(-s * 0.8, s * 0.6); ctx.lineTo(s * 0.8, s * 0.6);
+        ctx.closePath(); ctx.fill();
+      } else if (this.shape === "hex") {
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (Math.PI / 3) * i;
+          const px = s * 0.7 * Math.cos(a), py = s * 0.7 * Math.sin(a);
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.closePath(); ctx.fill();
+      } else {
+        ctx.beginPath(); ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2); ctx.fill();
       }
-      ctx.closePath();
-      ctx.fillStyle = `hsla(${this.hue}, ${this.sat}%, ${this.light}%, ${this.alpha})`;
-      ctx.shadowColor = `hsla(${this.hue}, ${this.sat}%, ${this.light}%, ${this.alpha * 0.6})`;
-      ctx.shadowBlur = this.size * 4;
-      ctx.fill();
       ctx.restore();
     }
   }
 
-  class Orbiter {
-    constructor() {
-      this.angle = Math.random() * Math.PI * 2;
-      this.radius = 8 + Math.random() * 12;
-      this.speed = 0.02 + Math.random() * 0.03;
-      this.size = 1.5 + Math.random() * 1.5;
-      this.phase = Math.random() * Math.PI * 2;
-      this.hue = 250 + Math.random() * 30;
+  class Ripple {
+    constructor(x, y) {
+      this.x = x; this.y = y;
+      this.radius = 0;
+      this.maxRadius = 40 + Math.random() * 30;
+      this.life = 1;
+      this.decay = 0.025;
     }
     update() {
-      this.angle += this.speed;
+      this.radius += 2;
+      this.life -= this.decay;
     }
-    draw(mx, my) {
-      const x = mx + Math.cos(this.angle) * this.radius;
-      const y = my + Math.sin(this.angle) * this.radius;
-      const a = 0.4 + Math.sin(this.angle * 2 + this.phase) * 0.25;
-      const s = this.size * (0.8 + Math.sin(this.angle * 2 + this.phase) * 0.2);
+    draw() {
+      if (this.life <= 0) return;
+      const a = Math.max(0, this.life);
       ctx.save();
-      ctx.translate(x, y);
-      ctx.globalAlpha = a;
-      const outer = s, inner = s * 0.35, spikes = 4;
+      ctx.globalAlpha = a * 0.5;
       ctx.beginPath();
-      for (let i = 0; i < spikes * 2; i++) {
-        const r = i % 2 === 0 ? outer : inner;
-        const ang = (Math.PI / spikes) * i - Math.PI / 2;
-        i === 0 ? ctx.moveTo(r * Math.cos(ang), r * Math.sin(ang)) : ctx.lineTo(r * Math.cos(ang), r * Math.sin(ang));
-      }
-      ctx.closePath();
-      ctx.fillStyle = `hsla(${this.hue}, 70%, 65%, ${a})`;
-      ctx.shadowColor = `hsla(${this.hue}, 70%, 65%, ${a * 0.5})`;
-      ctx.shadowBlur = s * 3;
-      ctx.fill();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `hsla(250, 75%, 65%, ${a * 0.6})`;
+      ctx.lineWidth = 1.5 - a * 0.8;
+      ctx.shadowColor = `hsla(250, 75%, 65%, ${a * 0.3})`;
+      ctx.shadowBlur = 8;
+      ctx.stroke();
       ctx.restore();
     }
   }
 
-  for (let i = 0; i < 5; i++) orbiting.push(new Orbiter());
+  function drawCursor(x, y) {
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "rgba(108, 99, 255, 0.8)";
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.strokeStyle = "hsla(250, 75%, 65%, 0.3)";
+    ctx.lineWidth = 1;
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  let animId;
 
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const dx = mouse.x - mouse.prevX, dy = mouse.y - mouse.prevY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dx = mouse.x - mouse.px;
+    const dy = mouse.y - mouse.py;
+    const speed = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist > 1) {
-      const count = Math.min(Math.floor(dist * 0.15) + 1, 5);
+    trail.push({ x: mouse.x, y: mouse.y, life: 1 });
+    if (trail.length > 25) trail.shift();
+    trail.forEach(p => p.life -= 0.04);
+    trail = trail.filter(p => p.life > 0);
+
+    if (trail.length > 1) {
+      for (let i = 0; i < trail.length - 1; i++) {
+        const a = trail[i], b = trail[i + 1];
+        const alpha = a.life * 0.25;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = `hsla(250, 70%, 60%, ${alpha})`;
+        ctx.lineWidth = a.life * 0.8;
+        ctx.shadowColor = `hsla(250, 70%, 60%, ${alpha * 0.3})`;
+        ctx.shadowBlur = 4;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    if (speed > 2) {
+      const count = Math.min(Math.floor(speed * 0.12) + 1, 4);
       for (let i = 0; i < count; i++) {
-        stars.push(new Star(
-          mouse.x + (Math.random() - 0.5) * 8,
-          mouse.y + (Math.random() - 0.5) * 8
+        const spread = 4 + Math.random() * 6;
+        const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 1.2;
+        const force = 0.5 + Math.random() * 0.8;
+        particles.push(new Particle(
+          mouse.x + (Math.random() - 0.5) * spread,
+          mouse.y + (Math.random() - 0.5) * spread,
+          -Math.cos(angle) * force,
+          -Math.sin(angle) * force,
         ));
       }
     }
 
-    frameCount++;
-    if (frameCount % 8 === 0 && dist < 3) {
-      stars.push(new Star(
-        mouse.x + (Math.random() - 0.5) * 14,
-        mouse.y + (Math.random() - 0.5) * 14
-      ));
+    if (particles.length > 1) {
+      for (let i = 0; i < Math.min(particles.length, 30); i++) {
+        for (let j = i + 1; j < Math.min(particles.length, 30); j++) {
+          const a = particles[i], b = particles[j];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (d < 60) {
+            const alpha = Math.max(0, Math.min(a.life, b.life)) * 0.15 * (1 - d / 60);
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = `hsla(250, 70%, 60%, ${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      }
     }
 
-    stars = stars.filter(s => s.alpha > 0);
-    stars.forEach(s => { s.update(); s.draw(); });
-    if (stars.length > 150) stars = stars.slice(-150);
+    ripples.forEach(r => { r.update(); r.draw(); });
+    ripples = ripples.filter(r => r.life > 0);
 
-    orbiting.forEach(o => { o.update(); o.draw(mouse.x, mouse.y); });
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => { p.update(); p.draw(); });
+    if (particles.length > 120) particles = particles.slice(-120);
 
-    requestAnimationFrame(animate);
+    drawCursor(mouse.x, mouse.y);
+
+    animId = requestAnimationFrame(animate);
   }
 
   document.addEventListener("mousemove", e => {
-    mouse.prevX = mouse.x; mouse.prevY = mouse.y;
+    mouse.px = mouse.x; mouse.py = mouse.y;
     mouse.x = e.clientX; mouse.y = e.clientY;
   });
+
+  document.addEventListener("mousedown", () => {
+    ripples.push(new Ripple(mouse.x, mouse.y));
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI * 2 / 6) * i;
+      const force = 1.2 + Math.random() * 0.8;
+      particles.push(new Particle(mouse.x, mouse.y, Math.cos(angle) * force, Math.sin(angle) * force));
+    }
+  });
+
+  document.addEventListener("mouseleave", () => { mouse.x = -200; mouse.y = -200; });
+  document.addEventListener("mouseenter", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
 
   window.addEventListener("resize", resize);
   resize();
   animate();
 
-  return () => document.body.removeChild(canvas);
+  return () => {
+    cancelAnimationFrame(animId);
+    document.body.style.cursor = "";
+    document.body.removeChild(canvas);
+  };
 }
