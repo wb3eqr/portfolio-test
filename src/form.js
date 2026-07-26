@@ -3,6 +3,7 @@ export function initContactForm(containerId, t) {
   if (!container) return;
   container.innerHTML = `
     <form id="contact-form" class="space-y-3" action="https://formspree.io/f/xqapwqry" method="POST">
+      <input type="text" name="_gotcha" style="display:none">
       <div class="grid sm:grid-cols-2 gap-3">
         <input type="text" name="name" placeholder="${t.contact.namePlaceholder}" required class="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-xs outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]" style="caret-color:var(--accent)">
         <input type="email" name="email" placeholder="${t.contact.emailPlaceholder}" required class="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-xs outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]" style="caret-color:var(--accent)">
@@ -21,8 +22,9 @@ export function initContactForm(containerId, t) {
     const orig = btn.innerHTML;
     btn.innerHTML = '<span class="animate-pulse">Sending...</span>'; btn.disabled = true;
     try {
-      await fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
+      const res = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
+      if (!res.ok) throw new Error("HTTP " + res.status);
       form.innerHTML = `<div class="text-center py-8"><svg class="w-12 h-12 mx-auto mb-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p class="text-lg font-semibold">${t.contact.thanks}</p><p class="text-sm mt-2" style="color:var(--text-secondary)">${t.contact.reply}</p></div>`;
-    } catch { btn.innerHTML = orig; btn.disabled = false; alert("Error sending message. Try again."); }
+    } catch { btn.innerHTML = orig; btn.disabled = false; alert("Error. Try again or email me directly."); }
   });
 }

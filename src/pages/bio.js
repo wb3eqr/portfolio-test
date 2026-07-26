@@ -1,10 +1,10 @@
 export function bioPage(t) {
   return `
-    <section class="py-8 sm:py-12">
+    <section class="py-10 sm:py-14">
       <div class="max-w-4xl mx-auto px-4">
         <div class="mb-6 sm:mb-8">
           <span class="text-xs font-medium tracking-widest uppercase" style="color:var(--accent)">${t.bio.about}</span>
-          <h2 class="text-xl sm:text-3xl font-bold mt-1 tracking-tight">${t.bio.title}</h2>
+          <h2 class="text-2xl sm:text-4xl font-bold mt-1 tracking-tight">${t.bio.title}</h2>
           <p class="text-sm text-[var(--text-secondary)] mt-1 max-w-xl">${t.bio.desc}</p>
         </div>
         <div class="grid md:grid-cols-2 gap-3 mb-8">
@@ -21,7 +21,7 @@ export function bioPage(t) {
         </div>
         <div class="mb-6">
           <span class="text-xs font-medium tracking-widest uppercase" style="color:var(--accent)">${t.bio.timeline}</span>
-          <h2 class="text-xl sm:text-3xl font-bold mt-1 tracking-tight">${t.bio.journey}</h2>
+          <h2 class="text-2xl sm:text-4xl font-bold mt-1 tracking-tight">${t.bio.journey}</h2>
         </div>
         <div class="relative">
           <div class="absolute left-[13px] top-0 bottom-0 w-px" style="background:var(--border)"></div>
