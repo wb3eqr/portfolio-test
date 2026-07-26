@@ -57,8 +57,7 @@ export const en = {
     namePlaceholder: "Your name", emailPlaceholder: "Your email", msgPlaceholder: "Your message...",
   },
   common: {
-    footer: "Built with precision.", email: "Email",
-    codeEst: "lines of code (est.)", days: "days",
+    footer: "Built with precision.",
     guestbookTitle: "Guestbook", guestbookSign: "Sign", guestbookName: "Your name",
     guestbookMsg: "Leave a message...", guestbookPost: "Post", guestbookEmpty: "No messages yet. Be the first!",
   },
@@ -123,8 +122,7 @@ export const ru = {
     namePlaceholder: "Ваше имя", emailPlaceholder: "Ваш email", msgPlaceholder: "Ваше сообщение...",
   },
   common: {
-    footer: "Сделано с аккуратностью.", email: "Почта",
-    codeEst: "строк кода (прибл.)", days: "дней",
+    footer: "Сделано с аккуратностью.",
     guestbookTitle: "Гостевая", guestbookSign: "Написать", guestbookName: "Ваше имя",
     guestbookMsg: "Оставьте сообщение...", guestbookPost: "Отправить", guestbookEmpty: "Пока нет записей. Будьте первым!",
   },

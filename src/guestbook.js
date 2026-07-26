@@ -1,7 +1,10 @@
 export function initGuestbook(containerId, t) {
   const container = document.getElementById(containerId);
   if (!container) return;
-  const messages = JSON.parse(localStorage.getItem("guestbook") || "[]");
+  const raw = localStorage.getItem("guestbook");
+  let messages = [];
+  if (raw) try { const p = JSON.parse(raw); if (Array.isArray(p)) messages = p; } catch {}
+  if (messages.length > 50) { messages = messages.slice(-50); localStorage.setItem("guestbook", JSON.stringify(messages)); }
   const g = t.common || {};
   function escape(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
   function render() {

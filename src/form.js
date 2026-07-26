@@ -2,14 +2,14 @@ export function initContactForm(containerId, t) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = `
-    <form id="contact-form" class="space-y-4" action="https://formspree.io/f/xqapwqry" method="POST">
-      <div class="grid sm:grid-cols-2 gap-4">
-        <input type="text" name="name" placeholder="${t.contact.namePlaceholder}" required class="w-full px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-sm outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]" style="caret-color:var(--accent)">
-        <input type="email" name="email" placeholder="${t.contact.emailPlaceholder}" required class="w-full px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-sm outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]" style="caret-color:var(--accent)">
+    <form id="contact-form" class="space-y-3" action="https://formspree.io/f/xqapwqry" method="POST">
+      <div class="grid sm:grid-cols-2 gap-3">
+        <input type="text" name="name" placeholder="${t.contact.namePlaceholder}" required class="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-xs outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]" style="caret-color:var(--accent)">
+        <input type="email" name="email" placeholder="${t.contact.emailPlaceholder}" required class="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-xs outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)]" style="caret-color:var(--accent)">
       </div>
-      <textarea name="message" rows="4" placeholder="${t.contact.msgPlaceholder}" required class="w-full px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-sm outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)] resize-none" style="caret-color:var(--accent)"></textarea>
-      <button type="submit" class="btn-primary w-full px-6 py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <textarea name="message" rows="3" placeholder="${t.contact.msgPlaceholder}" required class="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--glass-border)] text-[var(--text)] text-xs outline-none transition-all duration-300 focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-glow)] resize-none" style="caret-color:var(--accent)"></textarea>
+      <button type="submit" class="btn-primary w-full px-4 py-2.5 rounded-xl font-medium text-xs flex items-center justify-center gap-2">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         ${t.contact.send}
       </button>
     </form>`;

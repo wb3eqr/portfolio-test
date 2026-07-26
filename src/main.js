@@ -3,7 +3,6 @@ import { initParticles } from "./particles.js";
 import { initCursor } from "./cursor.js";
 import { initTerminal } from "./terminal.js";
 import { initGitHubStats } from "./ghstats.js";
-import { initCodeCounter } from "./codecounter.js";
 import { initGuestbook } from "./guestbook.js";
 import { initContactForm } from "./form.js";
 import { renderCarousel } from "./carousel.js";
@@ -79,7 +78,6 @@ async function render(path, animate) {
   if (path === "/") {
     setTimeout(() => initTerminal("terminal-container", currentLang), 300);
     setTimeout(() => initGitHubStats("gh-stats-container"), 500);
-    setTimeout(() => initCodeCounter("code-counter-container", getTranslations()), 600);
   }
   if (path === "/contact") {
     setTimeout(() => initContactForm("contact-form-container", getTranslations()), 200);
